@@ -1,0 +1,57 @@
+    
+{% macro item_card(item) %}
+<div class="card mb-3 shadow-sm">
+    <div class="card-body">
+        <h5 class="card-title">{{ item.name }}</h5>
+
+        <p class="card-text">
+            Giá:
+            {{ "{:,.0f}".format(item.price).replace(",", ".") }} đ
+        </p>
+    </div>
+</div>
+{% endmacro %}
+
+
+{% macro pagination(page, pages, endpoint) %}
+<nav>
+    <ul class="pagination justify-content-center">
+
+        {% if page > 1 %}
+        <li class="page-item">
+            <a class="page-link"
+               href="{{ url_for(endpoint, page=page-1) }}">
+                « Trước
+            </a>
+        </li>
+        {% endif %}
+
+        {% for p in range(1, pages + 1) %}
+            {% if p == page %}
+            <li class="page-item active">
+                <span class="page-link fw-bold">
+                    {{ p }}
+                </span>
+            </li>
+            {% else %}
+            <li class="page-item">
+                <a class="page-link"
+                   href="{{ url_for(endpoint, page=p) }}">
+                    {{ p }}
+                </a>
+            </li>
+            {% endif %}
+        {% endfor %}
+
+        {% if page < pages %}
+        <li class="page-item">
+            <a class="page-link"
+               href="{{ url_for(endpoint, page=page+1) }}">
+                Sau »
+            </a>
+        </li>
+        {% endif %}
+
+    </ul>
+</nav>
+{% endmacro %}

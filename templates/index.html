@@ -1,0 +1,48 @@
+
+{% extends "base.html" %}
+
+{% block title %}Trang chủ{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid bg-primary text-white text-center p-5">
+    <h1>{{ shop.name }}</h1>
+    <p>{{ shop.address }}</p>
+    <p>Giờ mở cửa: {{ shop.open }}h - {{ shop.close }}h</p>
+
+    {% if is_open %}
+        <span class="badge bg-success fs-5">
+            Quán đang mở cửa
+        </span>
+    {% else %}
+        <span class="badge bg-danger fs-5">
+            Quán đang đóng cửa
+        </span>
+    {% endif %}
+</div>
+
+<div class="container mt-5">
+    <div class="card shadow-sm p-4">
+        <h2>Khuyến mãi hiện tại</h2>
+
+        <ul class="list-group">
+            {% for promo in promotions %}
+                <li class="list-group-item">
+                    {{ promo }}
+                </li>
+            {% else %}
+                <li class="list-group-item">
+                    Không có khuyến mãi.
+                </li>
+            {% endfor %}
+        </ul>
+
+        <div class="mt-4">
+            <a href="/menu" class="btn btn-primary">
+                Xem thực đơn
+            </a>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

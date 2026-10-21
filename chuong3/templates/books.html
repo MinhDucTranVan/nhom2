@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Danh sách sách</title>
+</head>
+<body>
+
+<h1>Danh sách sách</h1>
+<p>
+    Thể loại:
+    <a href="{{ url_for('books') }}">Tất cả</a> |
+    <a href="{{ url_for('books', category='Lập trình') }}">Lập trình</a> |
+    <a href="{{ url_for('books', category='Web') }}">Web</a> |
+    <a href="{{ url_for('books', category='Cơ sở dữ liệu') }}">Cơ sở dữ liệu</a>
+</p>
+<table border="1">
+    <tr>
+        <th>ID</th>
+        <th>Tên sách</th>
+        <th>Tác giả</th>
+        <th>Năm</th>
+        <th>Thể loại</th>
+        <th>Sẵn sàng</th>
+    </tr>
+
+    {% for book in books %}
+    <tr>
+        <td>{{ book.id }}</td>
+        <td>
+            <a href="{{ url_for('book_detail', book_id=book.id) }}">
+                {{ book.title }}
+            </a>
+        </td>
+        <td>{{ book.author }}</td>
+        <td>{{ book.year }}</td>
+        <td>{{ book.category }}</td>
+        <td>{{ book.available }}</td>
+    </tr>
+    {% endfor %}
+
+</table>
+
+</body>
+</html>
