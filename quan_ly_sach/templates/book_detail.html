@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ sach.title }} - Nhà sách Sông Hương</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  </head>
+  <body class="bg-light">    <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
+      <div class="container">
+        <a class="navbar-brand fw-bold" href="/books">Nhà sách Sông Hương</a>
+        <div class="ms-auto d-flex align-items-center">
+          <a href="/books" class="nav-link text-white me-3">Sách</a>
+          <a href="/gio-hang" class="btn btn-warning position-relative">
+             Giỏ hàng
+            {% if tong_so_luong_gio_hang > 0 %}
+              <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                {{ tong_so_luong_gio_hang }}
+              </span>
+            {% endif %}
+          </a>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container mb-5">
+      <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="/books">Sách</a></li>
+          <li class="breadcrumb-item"><a href="/books?ma_danh_muc={{ sach.category_id }}">{{ sach.category.name }}</a></li>
+          <li class="breadcrumb-item active" aria-current="page">{{ sach.title }}</li>
+        </ol>
+      </nav>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      <div class="card shadow-sm p-4">
+        <div class="row g-4">
+          <div class="col-md-5 text-center">
+            {% if sach.anhbia %}
+              <img src="{{ url_for('static', filename='uploads/' + sach.anhbia) }}" 
+                   alt="{{ sach.title }}" class="img-fluid rounded shadow-sm" style="max-height: 400px;" />
+            {% else %}
+              <div class="bg-secondary text-white rounded d-flex align-items-center justify-content-center mx-auto" 
+                   style="height: 380px; width: 260px; font-size: 1.2rem;">Ảnh bìa</div>
+            {% endif %}
+          </div>
+          <div class="col-md-7">
+            <h2 class="fw-bold mb-2">{{ sach.title }}</h2>
+            <p class="text-muted mb-2">
+              Tác giả: <strong>{{ sach.author }}</strong>
+              {% if sach.nhaxuatban %} · NXB: <strong>{{ sach.nhaxuatban }}</strong>{% endif %}
+              {% if sach.namxuatban %} ({{ sach.namxuatban }}){% endif %}
+            </p>
+            <p class="text-muted small">Danh mục: <span class="badge bg-info text-dark">{{ sach.category.name }}</span></p>
+            <div class="my-3">
+              <span class="fs-2 fw-bold text-danger">{{ "{:,.0f}".format(sach.price) }} đ</span>
+            </div>
+
+            <div class="mb-3">
+              {% if sach.quantity > 0 %}
+                <span class="text-success fw-bold">● Còn {{ sach.quantity }} cuốn</span>
+              {% else %}
+                <span class="text-danger fw-bold">● Hết hàng</span>
+              {% endif %}
+            </div>
+
+            <hr />
+
+            {% if sach.quantity > 0 %}
+              <form action="/gio-hang/them/{{ sach.id }}" method="POST" class="mb-4">
+                <label class="form-label fw-bold">Số lượng:</label>
+                <div class="d-flex align-items-center mb-2" style="max-width: 250px;">
+                  <button type="button" class="btn btn-outline-secondary" onclick="giamSoLuong()">−</button>
+                  <input type="number" id="o_so_luong" name="so_luong" value="1" min="1" 
+                         max="{{ so_luong_con_lai_co_the_mua }}" class="form-control text-center mx-2" required />
+                  <button type="button" class="btn btn-outline-secondary" onclick="tangSoLuong()">+</button>
+                </div>
+
+                <div class="small text-muted mb-3">
+                  Tối đa thêm được: <strong>{{ so_luong_con_lai_co_the_mua }}</strong>
+                  {% if so_luong_da_co > 0 %} (Đã có {{ so_luong_da_co }} trong giỏ){% endif %}
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-lg px-4" 
+                  {% if so_luong_con_lai_co_the_mua <= 0 %}disabled{% endif %}>
+                   Thêm vào giỏ hàng
+                </button>
+              </form>
+            {% else %}
+              <div class="alert alert-warning">Hết hàng.</div>
+            {% endif %}
+
+            <h5 class="fw-bold mt-4">Mô tả sản phẩm</h5>
+            <p class="text-secondary" style="white-space: pre-line;">
+              {{ sach.description if sach.description else 'Chưa có mô tả cho sách này.' }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function tangSoLuong() {
+        const input = document.getElementById('o_so_luong');
+        const max = parseInt(input.max);
+        let val = parseInt(input.value) || 1;
+        if (val < max) input.value = val + 1;
+      }
+      function giamSoLuong() {
+        const input = document.getElementById('o_so_luong');
+        let val = parseInt(input.value) || 1;
+        if (val > 1) input.value = val - 1;
+      }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>

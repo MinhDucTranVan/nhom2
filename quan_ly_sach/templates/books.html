@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nhà sách Sông Hương - Mua sách trực tuyến</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  </head>
+  <body class="bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
+      <div class="container">
+        <a class="navbar-brand fw-bold" href="/books">📖 Nhà sách Sông Hương</a>
+        <div class="ms-auto d-flex align-items-center">
+          <a href="/books" class="nav-link text-white me-3 active">Sách</a>
+          <a href="/gio-hang" class="btn btn-warning position-relative">
+             Giỏ hàng
+            {% if tong_so_luong_gio_hang > 0 %}
+              <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                {{ tong_so_luong_gio_hang }}
+              </span>
+            {% endif %}
+          </a>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container mb-5">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      <div class="card p-3 mb-4 shadow-sm">
+        <form method="GET" action="/books" class="row g-2 align-items-center">
+          <div class="col-md-6">
+            <input type="text" name="tu_khoa" value="{{ tu_khoa }}" class="form-control" placeholder="Tìm tên sách, tác giả..." />
+          </div>
+          <div class="col-md-4">
+            <select name="ma_danh_muc" class="form-select">
+              <option value="">Mọi danh mục</option>
+              {% for dm in tat_ca_danh_muc %}
+                <option value="{{ dm.id }}" {% if ma_danh_muc_chon == dm.id %}selected{% endif %}>{{ dm.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-2 d-grid">
+            <button type="submit" class="btn btn-primary">Lọc</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for sach in danh_sach_sach %}
+          <div class="col">
+            <div class="card h-100 shadow-sm">
+              <a href="/books/{{ sach.id }}" class="text-center bg-white p-3 text-decoration-none">
+                {% if sach.anhbia %}
+                  <img src="{{ url_for('static', filename='uploads/' + sach.anhbia) }}" 
+                       class="card-img-top" style="height: 220px; object-fit: contain;" alt="{{ sach.title }}" />
+                {% else %}
+                  <div class="bg-secondary text-white rounded d-flex align-items-center justify-content-center mx-auto" 
+                       style="height: 220px; width: 160px;">Ảnh bìa</div>
+                {% endif %}
+              </a>
+
+              <div class="card-body d-flex flex-column">
+                <h5 class="card-title">
+                  <a href="/books/{{ sach.id }}" class="text-decoration-none text-dark fw-bold">{{ sach.title }}</a>
+                </h5>
+                <p class="text-muted small mb-2">Tác giả: {{ sach.author }}</p>
+                <div class="d-flex justify-content-between align-items-center mt-auto mb-3">
+                  <span class="fs-5 fw-bold text-danger">{{ "{:,.0f}".format(sach.price) }} đ</span>
+                  {% if sach.quantity > 0 %}
+                    <span class="badge bg-success-subtle text-success border border-success">Còn {{ sach.quantity }}</span>
+                  {% else %}
+                    <span class="badge bg-danger-subtle text-danger border border-danger">Hết hàng</span>
+                  {% endif %}
+                </div>
+
+                {% if sach.quantity > 0 %}
+                  <form action="/gio-hang/them/{{ sach.id }}" method="POST" class="d-grid">
+                    <input type="hidden" name="so_luong" value="1" />
+                    <button type="submit" class="btn btn-outline-primary">+ Thêm vào giỏ</button>
+                  </form>
+                {% else %}
+                  <button class="btn btn-secondary" disabled>Hết hàng</button>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        {% else %}
+          <div class="col-12 text-center py-5">
+            <h5 class="text-muted">Chưa có cuốn sách nào hoặc không tìm thấy sách phù hợp!</h5>
+            <p class="text-secondary">Bạn có thể vào <a href="/sach">Trang Quản Trị Sách</a> để thêm sách mẫu vào.</p>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>
